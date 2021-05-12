@@ -81,6 +81,7 @@ func prometheusExport(group types.Group, timePeriod types.DateInterval) string {
 	costAmount := aws.ToString(cost.Amount)
 	costCurrency := aws.ToString(cost.Unit)
 	startDate := aws.ToString(timePeriod.Start)
+	// endDate := aws.ToString(timePeriod.End)
 
 	return fmt.Sprintf(
 		"aws_cost{currency=\"%s\", service=\"%s\", startDate=\"%s\"} %s",
