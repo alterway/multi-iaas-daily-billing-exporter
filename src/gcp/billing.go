@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/joho/godotenv"
 	"google.golang.org/api/iterator"
 )
 
@@ -29,6 +31,22 @@ type Row struct {
 	Id          string
 }
 
+func goDotEnvVariable(key string) string {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
+}
+
+func getEnv(name string) string {
+	if value, ok := os.LookupEnv(name); ok {
+		return value
+	}
+	return goDotEnvVariable(name)
+}
+
 func (r *Report) prometheus() string {
 	return fmt.Sprintf(
 		"gcp_cost{currency=\"%s\", service=\"%s\", dateReport=\"%s\", project=\"%s\"} %.2f",
@@ -41,8 +59,8 @@ func (r *Report) prometheus() string {
 
 func ReportHandler(w http.ResponseWriter) {
 	ctx := context.Background()
-	projectID := "semafor-321815"
-	queryTable := "`semafor_bq_billing.gcp_billing_export_v1_0180A4_19C612_BD6EA4`"
+	projectID := getEnv("GCP_PROJECTID")
+	queryTable := getEnv("GCP_TABLE")
 	service, err := bigquery.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("bigquery.NewClient: %v", err)
@@ -54,8 +72,6 @@ func ReportHandler(w http.ResponseWriter) {
 			"WHERE DATE(usage_start_time) >= DATE_ADD(CURRENT_DATE(), INTERVAL -1 DAY) " +
 			"GROUP BY date_report, service.description, project.id " +
 			"ORDER BY date_report")
-	// Location must match that of the dataset(s) referenced in the query.
-	// q_daily.Location = "EU"
 
 	// Run the query and print results when the query job is completed.
 	job, err := q_daily.Run(ctx)

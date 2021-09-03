@@ -98,6 +98,7 @@ github.com/googleapis/gax-go/v2
 github.com/gorilla/mux
 # github.com/joho/godotenv v1.3.0
 ## explicit
+github.com/joho/godotenv
 # go.opencensus.io v0.23.0
 go.opencensus.io
 go.opencensus.io/internal
