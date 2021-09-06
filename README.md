@@ -72,11 +72,11 @@ To deploy the Multi iaas billing exporter, use the command below
 
 ## Results:
 
-In your prometheus instance, you can find `aws_cost` and `gcp_cost` metrics after the intervall specified in `manifest.yaml`. This interval represents the frequency of daily billing query. **Note that** a very small intervall may imply additional cost while querying billing from AWS and GCP providers. 
-The following screenshot showcases the ``gcp_cost` metric in prometheus.
+In your Prometheus instance, you can find `aws_cost` and `gcp_cost` metrics after the intervall specified in `manifest.yaml`. This interval represents the frequency of daily billing query. **Note that** a very small intervall may imply additional cost while querying billing from AWS and GCP providers. 
+The following screenshot showcases the ``gcp_cost` metric in Prometheus.
 
 
 ![prom](/img/result.png)
 
 
-Made with **<3** by the **R&D team @ [`Alter way`](https://www.alterway.fr/)**
+Made with **<3** by the **Cloud and R&D teams @ [`Alter way`](https://www.alterway.fr/)**
