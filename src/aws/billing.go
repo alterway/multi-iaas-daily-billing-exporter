@@ -83,7 +83,7 @@ func prometheusExport(group types.Group, timePeriod types.DateInterval) string {
 	startDate := aws.ToString(timePeriod.Start)
 
 	return fmt.Sprintf(
-		"aws_cost{currency=\"%s\", service=\"%s\", startDate=\"%s\"} %s",
+		"cloud_cost{provider=\"aws\", currency=\"%s\", service=\"%s\", startDate=\"%s\"} %s",
 		costCurrency,
 		serviceName,
 		startDate,

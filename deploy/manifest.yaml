@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: multi-iaas-billing-exporter
+  name: multi-iaas-daily-billing-exporter
   labels:
-    app.kubernetes.io/name: multi-iaas-billing-exporter
+    app.kubernetes.io/name: multi-iaas-daily-billing-exporter
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: multi-iaas-billing-exporter
+      app.kubernetes.io/name: multi-iaas-daily-billing-exporter
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: multi-iaas-billing-exporter
+        app.kubernetes.io/name: multi-iaas-daily-billing-exporter
     spec:
       volumes:
       - name: aws-volume
@@ -26,16 +26,17 @@ spec:
       imagePullSecrets:
         - name: access-token
       containers:
-        - name: multi-iaas-billing-exporter
+        - name: multi-iaas-daily-billing-exporter
           imagePullPolicy: Always
-          image: alterwayrnd/multi-iaas-billing-exporter:latest
+          #image: alterwayrnd/multi-iaas-daily-billing-exporter:latest
+          image: hub.rnd.alterway.fr/overboard/5gbiller/multi-iaas-billing-exporter:test
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
           - name: GCP_PROJECTID
-            value: ""
+            value: "semafor-321815"
           - name: GCP_TABLE
-            value: ""
+            value: "`semafor_bq_billing.gcp_billing_export_v1_0180A4_19C612_BD6EA4`"
           volumeMounts:
             - mountPath: /var/secrets/aws/
               name: aws-volume
@@ -54,15 +55,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: multi-iaas-billing-exporter-svc
+  name: multi-iaas-daily-billing-exporter-svc
   labels:
-    app.kubernetes.io/name: multi-iaas-billing-exporter
+    app.kubernetes.io/name: multi-iaas-daily-billing-exporter
 spec:
   selector:
-    app.kubernetes.io/name: multi-iaas-billing-exporter
+    app.kubernetes.io/name: multi-iaas-daily-billing-exporter
   type: ClusterIP
   ports:
-  - name: multi-iaas-billing-exporter
+  - name: multi-iaas-daily-billing-exporter
     port: 9999
     protocol: TCP
     targetPort: 9999
@@ -70,14 +71,14 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: multi-iaas-billing-exporter-svc-monitor
+  name: multi-iaas-daily-billing-exporter-svc-monitor
   labels:
-    k8s-app: multi-iaas-billing-exporter-svc-monitor
+    k8s-app: multi-iaas-daily-billing-exporter-svc-monitor
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: multi-iaas-billing-exporter
+      app.kubernetes.io/name: multi-iaas-daily-billing-exporter
   endpoints:
-  - interval: 3600s
+  - interval: 20s
     targetPort: 9999
     path: '/metrics'
