@@ -1,54 +1,31 @@
 ---
 image: docker:stable
-
 services:
 - docker:dind
 
-.docker_login_gitlab: &docker_login_gitlab |
-  echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-
-.docker_login_dockerhub: &docker_login_dockerhub |
-  echo "$CI_DOCKER_REGISTRY_PASSWORD" | docker login -u "$CI_DOCKER_REGISTRY_USER" --password-stdin "$CI_DOCKER_REGISTRY"
-
 stages:
 - build
+- push
 
-build-master-gitlab:
+before_script:
+  - echo $AW_REGISTRY_PASSWORD | docker login -u "$AW_REGISTRY_USER" --password-stdin $AW_REGISTRY
+  - echo $CI_DOCKER_REGISTRY_PASSWORD | docker login -u "$CI_DOCKER_REGISTRY_USER" --password-stdin $CI_DOCKER_REGISTRY
+  - export AW_IMAGE_NAME=${AW_REGISTRY}/${AW_PROJECT_NAME}/${CI_PROJECT_NAME}
+  - >
+    if [ $CI_COMMIT_REF_NAME == "master" ]; then
+      export TAG_VERSION=latest
+    else
+      export TAG_VERSION=${CI_COMMIT_REF_NAME}
+    fi
+
+build-image:
   stage: build
   script:
-  - *docker_login_gitlab
-  - docker build -f ./Dockerfile --pull -t "$CI_REGISTRY_IMAGE:latest" .
-  - docker push "$CI_REGISTRY_IMAGE"
-  only:
-    refs:
-    - master
+  - docker build --pull -t ${AW_IMAGE_NAME}:${TAG_VERSION} .
+  - docker push ${AW_IMAGE_NAME}:${TAG_VERSION}
 
-build-master-dockerhub:
-  stage: build
+push-on-dockerhub:
+  stage: push
   script:
-  - *docker_login_dockerhub
-  - docker build -f ./Dockerfile --pull -t "$CI_DOCKER_REGISTRY_IMAGE:latest" .
-  - docker push "$CI_DOCKER_REGISTRY_IMAGE"
-  only:
-    refs:
-    - master
-
-build-dockerhub:
-  stage: build
-  script:
-  - *docker_login_dockerhub
-  - docker build -f ./Dockerfile --pull -t "$CI_DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
-  - docker push "$CI_DOCKER_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
-  except:
-    refs:
-    - master
-
-build-gitlab:
-  stage: build
-  script:
-  - *docker_login_gitlab
-  - docker build -f ./Dockerfile --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME" .
-  - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME"
-  except:
-    refs:
-    - master
+  - docker tag ${AW_IMAGE_NAME}:${TAG_VERSION} ${CI_DOCKER_REGISTRY_IMAGE}:${TAG_VERSION}
+  - docker push ${CI_DOCKER_REGISTRY_IMAGE}:${TAG_VERSION}
