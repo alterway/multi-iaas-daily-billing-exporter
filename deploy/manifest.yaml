@@ -35,9 +35,9 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
           - name: GCP_PROJECTID
-            value: ""
+            value: "semafor-321815"
           - name: GCP_TABLE
-            value: ""
+            value: "`semafor_bq_billing.gcp_billing_export_v1_0180A4_19C612_BD6EA4`"
           volumeMounts:
             - mountPath: /var/secrets/aws/
               name: aws-volume
@@ -80,6 +80,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: multi-iaas-daily-billing-exporter
   endpoints:
-  - interval: 3600s
+  - interval: 20s
     targetPort: 9999
     path: '/metrics'

@@ -27,5 +27,6 @@ build-image:
 push-on-dockerhub:
   stage: push
   script:
+  - docker pull ${AW_IMAGE_NAME}:${TAG_VERSION}
   - docker tag ${AW_IMAGE_NAME}:${TAG_VERSION} ${CI_DOCKER_REGISTRY_IMAGE}:${TAG_VERSION}
   - docker push ${CI_DOCKER_REGISTRY_IMAGE}:${TAG_VERSION}
