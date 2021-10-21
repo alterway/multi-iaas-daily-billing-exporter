@@ -49,7 +49,7 @@ func getEnv(name string) string {
 
 func (r *Report) prometheus() string {
 	return fmt.Sprintf(
-		"gcp_cost{currency=\"%s\", service=\"%s\", dateReport=\"%s\", project=\"%s\"} %.2f",
+		"cloud_cost{provider=\"gcp\", currency=\"%s\", service=\"%s\", dateReport=\"%s\", project=\"%s\"} %.2f",
 		r.Cost.Currency,
 		r.Service,
 		r.DateReport,
