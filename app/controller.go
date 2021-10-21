@@ -2,8 +2,10 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"git.alterway.fr/multi-iaas-billing-exporter/src/gcp"
@@ -17,6 +19,10 @@ func (a *App) BillingHandler() http.HandlerFunc {
 }
 
 func (a *App) TargetHandler() {
+	prometheusURL, _ := os.LookupEnv("PROMETHEUS_BACKEND_URL")
+	protocol := "http"
+	port := "9090"
+	targetEndpoint := fmt.Sprintf("%s://%s:%s/api/v1/targets", protocol, prometheusURL, port)
 	log.Printf("Configuring Prometheus scraping. This can take up to 2 minutes on top of scraping interval...\n")
 	ticker := time.NewTicker(1 * time.Second)
 	quit := make(chan struct{})
@@ -24,7 +30,7 @@ func (a *App) TargetHandler() {
 		for {
 			select {
 			case <-ticker.C:
-				resp, err := http.Get("http://prometheus-prometheus-oper-prometheus.monitoring.svc.cluster.local:9090/api/v1/targets")
+				resp, err := http.Get(targetEndpoint)
 				if err != nil {
 					log.Fatalln(err)
 

@@ -28,9 +28,10 @@ spec:
       containers:
         - name: multi-iaas-daily-billing-exporter
           imagePullPolicy: Always
-          #image: alterwayrnd/multi-iaas-daily-billing-exporter:latest
-          image: hub.rnd.alterway.fr/overboard/5gbiller/multi-iaas-billing-exporter:test
+          image: alterwayrnd/multi-iaas-daily-billing-exporter:latest
           env:
+          - name: PROMETHEUS_BACKEND_URL
+            value: prometheus-prometheus-oper-prometheus.monitoring.svc.cluster.local
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
           - name: GCP_PROJECTID
