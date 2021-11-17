@@ -2,8 +2,8 @@ name: Upload Docker image
 
 on:
   push:
-    # branches:
-    #   - 'master'
+    branches:
+      - 'master'
 
 jobs:
   build_image:
